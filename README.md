@@ -1,4 +1,4 @@
-# hl7v2 to json and html 
+## hl7v2 to json and html 
 
 hl7 to json parser and a viewer to display hl7 in a readable format
 
@@ -45,44 +45,44 @@ should get a directory structure
     open a browser on a client and enter
     http://[server ip or name]:10444/hl7viewer 
 
-### prerequisites
-  # install node on dev machine
+## prerequisites
+  ### install node on dev machine
     google it
-  # install nodemon
+  ### install nodemon
     npm install nodemon -g
-  #  install pm2 -- if you need a good proccess manager
+  ###  install pm2 -- if you need a good proccess manager
     npm install pm2 -g
-  #  install pkg if you need to build single file executables
+  ###  install pkg if you need to build single file executables
     npm install pkg -g
 
-### build
+# build
   cwd to directory with code
-  # install all node_modules
+  ### install all node_modules
     npm install
-  # build executable
+  #### build executable
     pkg .
 
-### running
-  # run executable
+# running
+  ### run executable
     hl7viewer.exe
-  # using node
+  ### using node
     node app-hl7.js
-  # using nodemon - this will watch any changes to files and restart
+  ### using nodemon - this will watch any changes to files and restart
     nodemon app-hl7.js
-  # using pm2 this is the prefered way on production server
-  # it will demonize the app and keep it running forevers,with monitoring
-  # also configure startup scripts to restart app after server-restart
+  ### using pm2 this is the prefered way on production server
+  ### it will demonize the app and keep it running forevers,with monitoring
+  ### also configure startup scripts to restart app after server-restart
     pm2 start hl7viewer.exe
     or
     pm2 start app-hl7.js
     
-### REST API
+# REST API
 
   [/hl72json]
   [/hl72json/:filename]
-  # hl72json read hl7 file and converts to json
-  # if no file id passed it read from the server directory set in the 
-  # config.hl7Directory
+  ### hl72json read hl7 file and converts to json
+  ### if no file id passed it read from the server directory set in the 
+  ### config.hl7Directory
       let url = `/hl72json/`
       or
       let url = `/hl72json/?filename=${file}`
@@ -99,8 +99,8 @@ should get a directory structure
           }
       });
   [/readfiles]
-  # read files fron config.hl7Directory on server and return in json format to show in grid
-  # this is usuall put in the url part of jqgrid
+  ### read files fron config.hl7Directory on server and return in json format to show in grid
+  ### this is usuall put in the url part of jqgrid
     jQuery("#fileviewer").jqGrid(
       "url":"/readfiles/",      
       "datatype":"json",
@@ -110,7 +110,7 @@ should get a directory structure
       ]
       ... blah blah
   [/convert2FHIR]
-  # convert hl7 v2 file to fhir
+  ### convert hl7 v2 file to fhir
     let url = `/convert2fhir`
     let _data = editor.getSession().getValue()  // get hl7 data from editor - could be file contents
     $.ajax({
