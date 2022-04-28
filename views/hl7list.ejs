@@ -1,0 +1,1025 @@
+<html>
+    <link rel="stylesheet" type="text/css" media="screen" id="jqtheme" href="/themes/smoothness/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/themes/ui.multiselect.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="/themes/ui.jqgrid.css" />
+    <script src="/jqgrid/jquery.js" type="text/javascript"></script>
+    <script src="/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+    <link href="/jquery-ui/jquery.multiselect.css" rel="stylesheet" />
+    <script src="/jquery-ui/jquery.multiselect.js"></script>
+    
+    <script type="text/ecmascript" src="/jqgrid/js/jquery.jqGrid.min.js" ></script>
+    <script type="text/ecmascript" src="/jqgrid/js/i18n/grid.locale-en.js"></script>
+    <script type="text/ecmascript" src="/jqgrid/plugins/jquery.tablednd.js" ></script>
+    <link href="/jsoneditor/dist/jsoneditor.css" rel="stylesheet" type="text/css">
+    <script src="/jsoneditor/dist/jsoneditor.js"></script>
+    <script src="/jsoneditor/fhirjson2html.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/themes/jqgrid.css" />
+    <script src="/ace/build/src/ace.js" type="text/javascript" charset="utf-8"></script>
+	<script src="/ace/build/src/ext-statusbar.js"></script>
+
+    <style>
+
+
+        .floatdiv{
+        position:absolute;
+        top: 123px;
+        }
+
+        .portlet {
+            margin: 0 0 0  0;
+            padding:0;
+        }
+        .portlet-header {
+            padding: 0 0 ;
+            margin-bottom: 0;
+            position: relative;
+        }
+        .portlet-toggle {
+            position: relative;
+            top: 0;
+            right: 0;
+            margin-top: 0;
+            color:green
+        }
+        .portlet-content {
+            padding: 10;
+        }
+        div {
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+        }
+        body #fixedElement {
+            position:fixed !important;
+            position: absolute; /*ie6 */
+            bottom: 0;
+        }
+        .collapsetable{
+            border-collapse: collapse;
+            border: 3px solid blue;
+        }
+        .round{
+            border-radius: 15px;
+            border: 1px solid purple;
+            padding: 5px;
+        }
+        .content {
+            position: relative!important;
+            top: 1px;
+            left:0;
+            width:100%;
+            border: 0px solid #CCC;
+        }
+        .thumb {
+            height: 75px;
+            border: 1px solid #000;
+            margin: 10px 5px 0 0;
+        }
+        .navbar {
+            overflow: hidden;
+            z-index: 2400;
+            opacity: 0.70;
+            left: 10px;
+            top: 0px !important;
+            -webkit-transition: all 0.5s ease-in-out;
+            -moz-transition: all 0.5s ease-in-out;
+            -ms-transition: all 0.5s ease-in-out;
+            -o-transition: all 0.5s ease-in-out;
+            transition: all 0.5s ease-in-out;
+        }
+        .ui-dialog .ui-dialog-buttonpane {
+            text-align: left;
+            border-width: 0px 0 0 0;
+            background-image: none;
+            margin-top: .1em;
+            padding: .1em .1em .1em .1em;
+        }
+        .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
+            float: left;
+        }
+        .ui-dialog .ui-dialog-buttonpane button {
+            margin: .2em .1em .1em 0;
+            cursor: pointer;
+            
+        }
+        .ui-dialog .ui-resizable-se {
+            width: 12px;
+            height: 12px;
+            right: -5px;
+            bottom: -5px;
+            background-position: 16px 16px;
+            
+        }
+        .ui-draggable-handle {
+            -ms-touch-action: none;
+            touch-action: none;
+        }
+        #Btnclose{
+            font-size:12px;
+            width: 100px;
+            height: 20px;
+        }
+        #Btnload{
+            font-size:12px;
+            width: 100px;
+            height: 20px;
+        }
+    </style>
+  <style type="text/css" media="screen">
+    #editor { 
+        margin: 0;
+        position: absolute;
+        top: 1px;
+        bottom: 25px;
+        left: 0;
+        right: 0;
+      
+    }
+    #statusBar {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 25px;
+        background-color: rgb(135, 136, 136);
+        color: rgb(7, 7, 7);
+    }
+    .ace_status-indicator {
+        background: rgb(143, 128, 127);
+        position: absolute;
+        right: 0;
+        border-left: 1px solid;
+    }
+  </style>       
+   
+    <head>
+        <title>hl7 viewer</title>
+    </head>
+    <body>
+        <script>
+            var fieldStructures  
+            var segments
+            var codeNames
+            var HL7version = "v2.8"
+            var grid
+            var filegrid
+            var config
+            var _filename = '<%-_filename%>' ;
+			var _data = '<%-_data%>' ;
+            var setVal = false
+            //-----------------------------------------------------------------------------------
+            isEmpty = (str) => { // check if string is null or empty usually missing parameter
+                if (typeof str == 'string' ){
+                        return typeof str == 'string' && !str.trim() || str == 'undefined' || str == 'null' || str === '[]'|| str === '{}';
+                } else if (typeof str == 'array') {
+                    return str.length == 0;
+                } else if ( typeof str == 'object' ) {
+                    return Object.keys(str).length == 0;
+                } else {
+                    return str == null || str == undefined;    
+                } 
+            }
+            //--------------------------------------------------------------
+            let gridAddButton = (grid, options)=>{
+                grid.jqGrid('navButtonAdd','#'+PPpager,options);
+                grid.jqGrid('navButtonAdd','#'+grid[0].id+"_toppager",options);
+            };
+            //--------------------------------------------------
+            let ajax_get =(type,url, callback) => {
+                var xmlhttp = new XMLHttpRequest();
+                let data = ""
+                xmlhttp.onreadystatechange = function() {
+                    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                        try {
+                            data = xmlhttp.responseText
+                        } catch(err) {
+                            data = err.message + " in " + xmlhttp.responseText
+                        } finally {
+                            callback(data);
+                        }
+                    }
+                };
+                xmlhttp.open(type, url, true);
+                xmlhttp.send();
+            }
+            //---------------------------------------------
+            let setVerSelect=(selector)=>{
+                let versions = Object.keys(fieldStructures)
+                let options = "<select>"
+                versions.forEach((elem)=>{
+                    options += `<option value="${elem}">${elem}</option>`
+                })
+                options += "</select>"
+                $('#'+selector).html(options)
+            }
+             //---------------------------------------------
+             let setHl7 = (callback) =>{
+                let url = `/gethl7config`
+                let data = []
+                console.log("url config = ",url)
+                ajax_get("GET",url, (returnedData)=>{
+                    data = JSON.parse(returnedData)
+                    config=data
+                    segments = data.segments   
+                    fieldStructures = data.fields   
+                  
+                })
+                if(callback){
+                    callback(data)
+                } 
+            }
+            //---------------------------------------------
+            let getFieldSructure = (type,version,callback) =>{  
+                let fields = fieldStructures[version] && fieldStructures[version][type]?fieldStructures[version][type]:[]
+                // ggo throuhg fields replacing fields with code if not there
+                codeNames = config.codeNames
+                fields.forEach((elem,i) =>{
+                     if(elem.code) {
+                        fields[i].fields =  ( codeNames && codeNames[elem.code] ?codeNames[elem.code] :[]  )
+                     }
+                })
+                if(callback){
+                    callback(fields)
+                } else {
+                    return(fields)
+                }
+            }
+            //--------------------------------------------------------
+            let setVersion= (version)=>{
+                version = $("#defversion option:selected").val()
+                HL7version = ""+version+""
+                $('.ui-button:contains("Load")').click()
+                //grid.jqGrid('setGridParam',{datatype:'json'}).trigger('reloadGrid'); 
+            }     
+            //---------------------------------------------------------------- 
+            let readFile = (callback)=>{
+                $('#dialog-fileviewer').dialog('open')
+            }
+            //---------------------------------------------------------------- 
+            let readmsg = (callback)=>{
+                $('#dialog-hl7convert').dialog('open')
+            } 
+            //----------------------------------------------
+            let readfhir = (callback) =>{
+                let url = `/convert2fhir`
+                //let _data = $('#hl7raw').val()
+                let _data = editor.getSession().getValue()
+                $.ajax({
+                    headers: {
+                        'content-type': 'application/json; charset=utf-8',
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                    datatype:"json",
+                    type: "POST",
+                    url: url,
+                    data: JSON.stringify({data:_data}),
+                    success: (data)=>{
+                        if(callback){
+                            callback(data)
+                        }
+                    }
+                });       
+            }
+            //------------------------------------------------------------------
+            setHl7((data)=>{ })
+            //----------------------------------------------
+            let toggleIndex = () =>{
+                config.showSegmentIndex = ! config.showSegmentIndex
+                config.showFieldIndex = ! config.showFieldIndex        
+                $("#toggle1").css('background-color', `${config.showFieldIndex?'lightgreen':'pink'}`);
+                $("#toggle1").text( `${config.showFieldIndex?'hide index':'show index'}`);
+                $('.ui-button:contains("Load")').click()
+            }
+            //----------------------------------------------
+            let toggleEmptyData = () =>{
+                config.showEmptyData = ! config.showEmptyData
+                $("#toggle2").css('background-color', `${config.showEmptyData?'lightgreen':'pink'}`);
+                $("#toggle2").text( `${config.showEmptyData?'hide empty data':'show empty data'}`);
+                $('.ui-button:contains("Load")').click()
+            }
+            //----------------------------------------------
+            let toggleShowSegmentDescription = () =>{
+                config.ShowSegmentDescription = ! config.ShowSegmentDescription
+                $("#toggle3").css('background-color', `${config.ShowSegmentDescription?'lightgreen':'pink'}`);
+                $("#toggle3").text( `${config.ShowSegmentDescription?'hide segment description':'show segment description'}`);
+                $('.ui-button:contains("Load")').click()
+            }    
+            //----------------------------------------------
+            let togglecloseOnSelect = () =>{
+                config.closeOnSelect = ! config.closeOnSelect
+                $("#toggle4").css('background-color', `${config.closeOnSelect?'pink':'lightgreen'}`);
+                $("#toggle4").text( `${config.closeOnSelect?'leave filelist on select':'close filelist on select'}`);
+                $('.ui-button:contains("Load")').click()
+            }
+            //----------------------------
+            window.onload = () =>{  //vrom file picker
+                var fileInput = document.getElementById('fileInput');
+                fileInput.addEventListener('change', function(e) {
+                    let file = fileInput.files[0];
+                    let reader = new FileReader();
+                    reader.onload = (e) =>{
+                        let data= {data:e.target.result}
+                      //  $('#hl7raw').val(e.target.result)
+                        editor.setValue(e.target.result)
+                        $.ajax({
+							data:JSON.stringify(data),
+							headers: {
+								'content-type': 'application/json; charset=utf-8',
+								'Access-Control-Allow-Origin': '*',
+							},
+                            type: "POST",
+                            url: `/hl72json/`,
+                            datatype:"json",
+                            success: (data,textStatus,jqXHR)=>{
+                                grid.jqGrid("clearGridData");
+                                for(var i=0;i<=data.length;i++){
+	                                grid.jqGrid('addRowData',i+1,data[i]);
+                                }
+                            }
+                        });
+                        $('#hl7browser').show()
+                        $('#settings').show()
+                    }
+                    reader.readAsText(file);	
+                });
+            }
+            //-----------------------------------------------------------
+            let loadFhir = ()=>{
+                //let _data =   $('#hl7raw').val()
+                let _data = editor.getSession().getValue()
+                if( isEmpty( _data)) {
+                    alert("Please Load HL7 file")
+                } else {
+                    $('#dialog-fhir').dialog('open')
+                }
+            }
+              //--------------------------------------------
+              let loadData = (data,callback) => {		 
+                    data = data || _data
+                    $.ajax({
+                        headers: {
+                            'content-type': 'application/json; charset=utf-8',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        datatype:"json",
+                        type: "POST",
+                        url: '/hl72json',
+                        data: JSON.stringify({data:data}),
+                        success: function(data){
+                            console.log("LOADATA",data)
+                          callback(data)
+                        }
+                    });     
+                    //*/
+                }
+                 //-----------------------------------------
+                 let _formatHTML = (type,rowObject,callback)=> {
+                    let res = ``
+                    getFieldSructure(type,HL7version,(fields)=>{
+                        if(fields){
+                            Object.keys(rowObject).forEach( (elem)=> {
+                                let index = Number(elem.split("_")[1])
+                                let data = rowObject[elem]
+                                let field = fields[index]                               
+                                if(Array.isArray(data)){
+                                    let _fields = []
+                                    if(typeof field == 'object' ) {
+                                        _fields = field.fields
+                                        field = field.title
+                                    }
+                                    let _data = `<table style="border:0px dashed green;" >`  
+                                    data.forEach((_elem,i) => {
+                                        title = "?"
+                                        disp = []
+                                        if(typeof _fields[i] == 'object') {
+                                            title = _fields[i].title
+                                            disp = config.codeNames[_fields[i].code]
+                                        }
+                                        //----------
+                                        if(Array.isArray(_elem)){  // has sub values
+                                            let _h = `<table style="border:0px dashed green;" >`
+                                            _elem.forEach((el,idx)=>{
+                                              //  console.log(el)
+                                                if(config.showFieldIndex) {
+                                                    _h += (`<tr style="background:snow"><td width='380px';> <span style="color:darkgreen"> ${type+"."+index+"."+ Number(i+1) +"."+ Number(idx+1) } : </td><td width='250px'> <b>${el?el:'<span style=" background: orange;">No Data</span>'}<b></td></tr>`)      
+                                                } else {
+                                                    _h += (`<tr style="background:beige"><td width='350px';> <span style="color:darkred"> ${disp[idx]}: </td><td width='250px'><b>${el?el:'<span style=" background: orange;"><b>No Data</span>'}<b></td></tr>`)
+                                                }
+                                            })    
+                                            _h += '</table>'
+                                            _elem = _h
+                                        }
+                                        if(typeof _elem == "object"){ // has object
+                                           // console.log("Object",_elem)
+                                          //  field = field.title
+                                        }
+                                        //-----------------
+                                        if(_elem  || config.showEmptyData) {
+                                            if(config.showFieldIndex) {
+                                                _data += (`<tr style="background:snow" ><td width='380px';> <span style="color:darkgreen">
+                                                     ${_fields[i] && _fields[i].title ?  
+                                                        (type+"."+index+"."+ Number(i+1)+" - " + _fields[i].title ) : 
+                                                        _fields[i]?  
+                                                        (type+"."+index+"."+ Number(i+1)+" - " + _fields[i] ) : 
+                                                        (type+"."+index+"."+ Number(i+1) +'<span style="color:red"> - No Title</span>' )} : </td><td width='250px'> <b>${_elem?_elem:'<span style=" background: orange;">No Data</span>'}<b><br></td></tr>`)
+                                            } else{
+                                                _data += (`<tr style="background:whitesmoke" ><td  width='350px';> <span style="color:darkgreen"> ${_fields[i]? _fields[i].title?  _fields[i].title:_fields[i] :type+"."+index+"."+ Number(i+1) +'<span style="color:red"> - No Title</span>' } : </td><td width='250px'><b>${_elem?_elem:'<span style=" background: orange;"><b>No Data</span>'}<b><br></td></tr>`)
+                                            }
+                                        }
+                                    });
+                                    _data+= '</tr></table>'
+                                    data = _data
+                                }
+                                if(index) {
+                                    if(typeof field == 'object' ) {
+                                        field = field.title
+                                    }
+                                    if(data || config.showEmptyData){
+                                        if(config.showSegmentIndex) {
+                                            res += `<table class="collapsetable round" style="border:1px dashed green; background:${field?"white":"lavenderblush"}" ><td width='280px'><br><span style="color:navy">${field? type+"."+index+" - "+ field :type+"."+index +'<span style="color:red"> - No Title</span>'} :</span> </td><td width='400px'> <b>${data?data:'<span style=" background: pink;">No Data</span>'}</b> <br></td></table>`   
+                                        } else {
+                                            res += `<table class="collapsetable round" style="border:1px dashed green;background:${field?"white":"lavenderblush"}" ><td width='250px'><br><span style="color:navy">${field?field:type+"."+index +'<span style="color:red"> - No Title</span>'} :</span> </td><td width='400px'> <b>${data?data:'<span style=" background: pink;">No Data</span>'}</b> </td></table>`   
+                                        }
+                                    }
+                                }     
+                            })    
+                            if(callback){
+                                callback(res)
+                            }
+                        }
+                    })
+                    return res
+                }          
+               
+          //-----------------------------------------
+          function expandCollapseGroups(expandAll) {
+                var $grid = grid
+                var idPrefix =$grid[0].id + "ghead_0_", trspans;
+                var groups =$grid[0].p.groupingView.groups;
+                if ($grid[0].p.grouping) {
+                    for (var index = 0; index < groups.length; index++) {
+                        if (expandAll) {
+                            trspans = $("#" + idPrefix + index + " span.tree-wrap-" +$grid[0].p.direction + "." +$grid[0].p.groupingView.plusicon);
+                        } else {
+                            trspans = $("#" + idPrefix + index + " span.tree-wrap-" +$grid[0].p.direction + "." +$grid[0].p.groupingView.minusicon);
+                        }
+                        if (trspans.length > 0) {
+                            $grid.jqGrid('groupingToggle', idPrefix + index);
+                        }   
+                    }
+                } 
+            }
+            //-----------------------------------------------------------------------
+            $( () => {
+              
+                 //--------------------------------------------
+                 $( ".portlet" )
+                    .find( ".portlet-header" )
+                        .prepend( "<span class='ui-icon ui-icon-refresh portlet-toggle'></span>");
+                
+                $( ".portlet-toggle" ).on( "click", () => {
+                    var icon = $( this );
+                    $( ".portlet-header" ).toggleClass( 'ui-icon-circle-triangle-w  ui-icon-circle-triangle-e' );
+                    $('.portlet-content').toggle()
+                });
+
+                let load = ()=>{
+                    if(! isEmpty(_filename)){
+                        loadFile(_filename)
+                        $('#navbar').hide()
+                    } 
+                    if(! isEmpty(_data)) {
+                        loadData(_data)
+                        $('#navbar').hide()
+                    }
+                }
+                //---------------------------------------------
+                let loadFile = (file,cb) => {		
+                    file = file?file:_filename     
+                    if(! isEmpty(file)){
+                     //   $('#navbar').hide()
+                    }
+                    let newurl = `/hl72json/?filename=${file}`
+                    $.ajax({
+                        headers: {
+                            'content-type': 'application/json; charset=utf-8',
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                        type: "POST",
+                        url: newurl,
+                        datatype:"json",
+                        success: (data,textStatus,jqXHR)=>{
+                          
+                            if(cb)  cb(data)
+                            grid.jqGrid("clearGridData");
+                            for(var i=0;i<=data.length;i++){
+                                grid.jqGrid('addRowData',i+1,data[i]);
+                            }
+                            $('#settings').show()
+                                $('#hl7browser').show()
+                        }
+                    });
+                    $('#settings').show()
+                    $('#hl7browser').show()
+                }
+              
+                //------------------------------------------------------
+                var jsoncontainer = document.getElementById("jsoneditor");
+                jsoneditor = new JSONEditor(jsoncontainer, { modes: ['view','text','tree','form'] });
+                PPpager = "hl7pager"; 
+                grid = $("#hl7list"); 
+                $('.ui-jqgrid .ui-jqgrid-bdiv').css('overflow-y', 'hidden');
+                $("#dialog-fileviewer").dialog({
+                    autoOpen: false,
+                    //minHeight: 385,
+                    width: '500px',
+                    hieght:'auto',
+                    modal: false,
+                    draggable: true,
+                    resizable: false,
+                    position: 'top',
+                    show:"slide",
+                    showOpt: {direction: 'down'},
+                    open: (event, ui) => {
+                        $("#dialog-fileviewer").css('overflow', 'hidden'); //this line does the actual hiding
+                        filepager = "hl7filepager";
+                        filegrid = $("#hl7filelist");   
+                        $('#error_msg' ).remove();
+                        let fileviewerOptions = { 
+                            "url":"/readfiles/",      
+                            "datatype":"json",
+                            "altRows": true, 
+                            "deepempty": true,
+                            "ignoreCase": true,
+                            "multiselect":false,
+                            "multiboxonly":false,
+                            "height":"100%",
+                            "width":"auto",
+                            "autowidth": true,
+                            "shrinkToFit": true,
+                            "scrollOffset":0,
+                            "hoverrows":false,
+                            "colModel":[
+                                {label:'file',name:'file', editable:false ,width:350,title: false},
+                              //  {label:'filename',name:'filename', editable:true ,width:350,title: true,hidden:false},
+                            ],
+                            "loadonce":true,
+                        // "toppager":true,
+                        // "pager":"#"+filepager,
+                            "rowTotal": 5000,
+                            "rowNum":5000,
+                            "rowList": [],        // disable page size dropdown leave empty array
+                            "pgbuttons": false,     // disable page control like next, back button
+                            "pgtext": null,         // disable pager text like 'Page 0 of 10'
+                            "viewrecords": false ,   // disable current view record text like 'View 1-10 of 100' 
+                            "gridview": false,
+                            "autoencode": true,           
+                            "caption": "" ,   
+                            beforeSelectRow: (rowid, e)=> {
+                                return true; // turn row highlight off
+                            },
+                            "ondblClickRow": (rowid, iRow,iCol) => {		           
+                             
+                                let rowData = filegrid.jqGrid("getRowData",rowid);
+                                let file = rowData.file                    
+                                loadFile(file,(data)=>{
+                                    if(config.loadEditorFromFile){
+                                        let url = `/rawhl7?filename=${file}`
+                                        console.log("rawurl = ",url)
+                                        ajax_get("GET",url, (returnedData)=>{
+                                       //   $('#hl7raw').val(returnedData)
+                                            editor.setValue(returnedData)
+                                        }) 
+                                    }
+                                    if(config.closeOnSelect){
+                                        $("#dialog-fileviewer").dialog('close');
+                                    }
+                                })
+                            },
+                            loadComplete:  () =>{
+                                // remove error div if exist
+                                $('#error_msg' ).remove();
+                            },
+                            loadError: function (jqXHR, textStatus, errorThrown) {
+                                $('#error_msg' ).remove();
+                                $(this).closest('div.ui-jqgrid').before(
+                                    '<div id="error_msg" style="max-width:' + this.style.width +
+                                        ';"><div class="ui-state-error ui-corner-all" style="padding:0.5em;float:left;">' +
+                                        decodeErrorMessage(jqXHR, textStatus, errorThrown) +
+                                        '</div><div style="clear:left"/></div>'
+                                );
+                            }
+                        };
+                     
+                        filegrid.jqGrid(fileviewerOptions);   
+                        //filegrid.jqGrid('gridResize',{minWidth:450,maxWidth:1400,minHeight:180, maxHeight:650});
+                        filegrid.closest("div.ui-jqgrid-view")
+                            .children("div.ui-jqgrid-hdiv")
+                            .hide();
+                    },
+                    close: () => {
+                     
+                        $('#error_msg' ).remove();
+                        $("#dialog-fileviewer").dialog('close');
+                    },
+                    buttons: [
+                        {
+                            text: "Close",
+                            "id":"Btnclose",
+                            open:()=>{
+                               // $(this).addClass('yescls')
+                            },
+                            click: () => {
+                                $('#error_msg' ).remove();
+                                $("#dialog-fileviewer").dialog('close');
+                            }
+                        }
+                    ]
+                })//.dialog('widget').find('.ui-dialog-titlebar').hide()
+                //----------------------------------------------------------
+                $("#dialog-hl7convert").dialog({
+                    autoOpen: false,
+                    //minHeight: 385,
+                    width: '600px',
+                    hieght:'350px',
+                    modal: false,
+                    draggable: true,
+                    resizable: true,
+                    show:"slide",
+                    showOpt: {direction: 'up'},
+                    open: (event, ui) => {
+                       $('#error_msg' ).remove();
+                    },
+                    close: () => {
+                            $("#dialog-hl7convert").dialog('close');
+                    },
+                    buttons: [
+                        {
+                            text: "Load",
+                            id:"Btnload",
+                            click: () => { 
+                                let url = `/togrid/`
+                             //   let data = {data:$('#hl7raw').val()}
+                                let data = {data: editor.getSession().getValue()}
+                                $.ajax({
+                                    data:JSON.stringify(data),
+                                    headers: {
+                                        'content-type': 'application/json; charset=utf-8',
+                                        'Access-Control-Allow-Origin': '*',
+                                    },
+                                    type: "POST",
+                                    url: `/togrid`,
+                                    datatype:"json",
+                                    success: (data,textStatus,jqXHR)=>{
+                                        grid.jqGrid("clearGridData");
+                                        for(var i=0;i<=data.length;i++){
+                                            grid.jqGrid('addRowData',i+1,data[i]);
+                                        }
+                                    }
+                                });                   
+                            //    grid.jqGrid('setCaption', "Loaded From Editor");
+                                $('#hl7browser').show()
+                            }
+                        },
+                        {
+                            text: "Close",
+                            id:"Btnclose",
+                            click: () => {
+                                $("#dialog-hl7convert").dialog('close');
+                            }
+                        },
+                    ]            
+                })//.dialog('widget').find('.ui-dialog-titlebar').hide()
+                //------------------------------------------------------------------
+                $("#dialog-fhir").dialog({
+                    autoOpen: false,
+                    //minHeight: 385,
+                    width: '800px',
+                    hieght:'400px',
+                    modal: false,
+                    draggable: true,
+                    resizable: true,
+                    show:"slide",
+                    showOpt: {direction: 'up'},
+                    open: (event, ui) => {
+                        $('#error_msg' ).remove();
+                        readfhir((data)=>{
+                            if(isEmpty(data)){
+                                alert("Please load a Valid hl7 file")
+                                $("#dialog-fhir").dialog('close');
+                            } else {
+                               jsoneditor.set(data)
+                            }	
+                        })
+                    },
+                    close: () => {
+                            $("#dialog-html").dialog('close');
+                    },
+                    buttons: [
+                        {
+                            text: "Load",
+                            id:"Btnload",
+                            open:()=>{
+                            },
+                            click: () => {
+                                readfhir((data)=>{
+                                    if(isEmpty(data)){
+                                        alert("Please load a Valid hl7 file")
+                                    } else {
+                                        jsoneditor.set(data)
+                                    }	
+                                })
+                            }
+                        },
+                        {
+                            text: "Close",
+                            id:"Btnclose",
+                            open:()=>{
+                               // $(this).addClass('yescls')
+                            },
+                            click: () => {
+                                $("#dialog-fhir").dialog('close');
+                            }
+                        },
+                    ]            
+                })//.dialog('widget').find('.ui-dialog-titlebar').hide()
+                //-----------------------------------------
+                  //------------------------------------------------------------------
+                  $("#dialog-html").dialog({
+                    autoOpen: false,
+                   // minHeight: 100,
+                    maxHeight: $(window).height(),
+                    open: function() {
+                                $(this).dialog('option', 'maxHeight', $(window).height());
+                    },
+                    create: function() {
+                        $(this).css("maxHeight", $(window).height());        
+                    },
+                    width: 'auto',
+                    modal: false,
+                    draggable: true,
+                    resizable: true,
+                    close: () => {
+                            $("#dialog-html").dialog('close');
+                    },
+                    buttons: [
+                       
+                        {
+                            text: "Close",
+                            id:"Btnclose",
+                            open:()=>{
+                               // $(this).addClass('yescls')
+                            },
+                            click: () => {
+                                $("#dialog-html").dialog('close');
+                            }
+                        },
+                    ]            
+                })//.dialog('widget').find('.ui-dialog-titlebar').hide()
+                //-----------------------------------------
+                function formatSegment(cellValue, options, rowObject) {
+                    let res = ""
+                    let seg = Object.keys(rowObject)[0].split("_")[0];
+                 
+                    let title = segments && segments[seg] ?segments[seg].title:""
+                    let description = segments && segments[seg]?segments[seg].description:""
+                    if(seg.startsWith("Z")) {
+                        _seg = "Zxx"
+                        title = segments && segments[_seg] ?segments[_seg].title:""
+                        description = segments && segments[_seg]?segments[_seg].description:""
+                    }
+                    if(seg.startsWith("H")) {
+                        _seg = "Hxx"
+                        title = segments && segments[_seg] ?segments[_seg].title:""
+                        description = segments && segments[_seg]?segments[_seg].description:""
+                    }
+                    if(config.ShowSegmentDescription){
+                        res = `<b>${seg}</b><br> ${title}<br><br> <div class="wordwrap">${description}</div>`
+                    } else {
+                        res = `<b>${seg}</b><br> ${title}<br><br>`
+                    }
+                    return res
+                }  
+                //-----------------------------------------
+                function formatHL7(cellValue, options, rowObject) {
+                    return  formatHTML(rowObject)
+                }  
+                   //-----------------------------------------
+                let formatHTML = (rowObject,callback)=> {
+                    let type = Object.values(rowObject)[0]
+                   return  _formatHTML(type,rowObject)
+                }
+               
+                //-----------------------------------------
+                let hl7Options = { 
+                    "url":`/hl72json/`,      
+                    "type": "POST",
+                    "datatype":"json",
+                    "altRows": false, 
+                    "deepempty": true,
+                    "autowidth": true,
+                    "shrinkToFit": true,
+                    "ignoreCase": true,
+                    "multiselect":false,
+                    "multiboxonly":false,
+                    "height":"700px",
+                    "width":"auto",
+                    "scrollOffset":0,
+                    "hoverrows":false,
+                    success: function (response) {
+                        console.timeEnd('gridload')
+                    },
+                    "colModel":[
+                        {label:'Seg',name:'grp' ,width:120,sortable:false},
+                        {label:'segment',name:'field',align: "center", key:true,width:120,title: false,sortable:false},
+                        {label:'Segment',name:'type',align: "center" ,width:120,title: false,sortable:false,formatter:formatSegment},
+                        {label:'Details',name:'type',width:450,title: false,sortable:false,formatter:formatHL7},
+                    ],
+                //  
+                    "loadonce":false,
+                // "toppager":true,
+                // "pager":"#"+PPpager,
+                    "rowTotal": 15000,
+                    "rowNum":150000,
+                    "rowList": [],        // disable page size dropdown leave empty array
+                    "pgbuttons": false,     // disable page control like next, back button
+                    "pgtext": null,         // disable pager text like 'Page 0 of 10'
+                    "viewrecords": false ,   // disable current view record text like 'View 1-10 of 100' 
+                    "gridview": false,
+                    "autoencode": true,           
+                    "caption": "" ,   
+                    grouping:true,
+                    groupingView : {
+                        groupField : ['grp','field'],
+                        groupColumnShow : [false,false],
+                        groupCollapse : true,
+                        groupText : ['<span style="color:blue;background:lightyellow" >{0} </span>- {1} segments','{0}'],
+                    },
+                    beforeSelectRow: (rowid, e)=> {
+                        return false; // turn row highlight off
+                    },
+                    loadComplete:  () =>{
+                        // remove error div if exist
+                        $('#error_msg' ).remove();
+                    },
+                    loadError: function (jqXHR, textStatus, errorThrown) {
+                        $('#error_msg' ).remove();
+                        $(this).closest('div.ui-jqgrid').before(
+                            '<div id="error_msg" style="max-width:' + this.style.width +
+                                ';"><div class="ui-state-error ui-corner-all" style="padding:0.5em;float:left;">' +
+                                decodeErrorMessage(jqXHR, textStatus, errorThrown) +
+                                '</div><div style="clear:left"/></div>'
+                        );
+                    },
+                  
+                };
+                grid.jqGrid(hl7Options);   
+                //-----------------------------------------------------------------
+                var decodeErrorMessage = function (jqXHR, textStatus, errorThrown) {
+                    var htmlBody, errorInfo, i, errorText = '',
+                        errorIconSpan = '<span class="ui-icon ui-icon-alert" style="float:left; display: inline-block; margin-right: .3em;"></span>';
+                    if (textStatus) {
+                        errorText = textStatus;
+                    }
+                    if (errorThrown) {
+                        if (errorText.length > 0) {
+                            errorText += '<hr/>';
+                        }
+                        errorText += errorThrown;
+                    }
+                    if (typeof (jqXHR.responseText) === "string") {
+                        if (jqXHR.responseText.charAt(0) === '[') {
+                            try {
+                                errorInfo = $.parseJSON(jqXHR.responseText);
+                                errorText = "";
+                                for (i = 0; i < errorInfo.length; i += 1) {
+                                    if (errorText.length !== 0) {
+                                        errorText += "<hr/>";
+                                    }
+                                    errorText += errorInfo[i].Source + ": " + errorInfo[i].Message;
+                                }
+                            } catch (e) { }
+                            errorText = errorIconSpan + errorText;
+                        } else {
+                            htmlBody = /<body.*?>([\s\S]*)<\/body>/i.exec(jqXHR.responseText);
+                            if (htmlBody !== null && htmlBody.length > 1) {
+                                errorText = htmlBody[1];
+                            }
+                        }
+                    } else {
+                        errorText = errorIconSpan + errorText;
+                    }
+                    return '<div style="float:left">' + errorText + '</div>';
+                };  
+                //-------------------------------
+                $(window).bind('resize', function () {
+                    grid.setGridWidth($(window).width() -20);
+                }).trigger('resize');
+                load()
+                $('#settings').hide()
+                    $('#hl7browser').hide()
+            });     
+           
+        </script> 
+        
+        <div id ="main">
+            <div id = "navbar" class="navbar" style="display:block"> 
+
+                <span class="portlet">
+                        <button   id="loadFile"   onclick="readFile()" class="ui-button-small ">Load from Server</button>
+                        or 
+                        <span>
+                            <input type="file" id="fileInput">
+                        </span>
+                    </span>
+                </span>
+                <span id="settings" class="portlet" >
+                    <span class="portlet-header"></span>
+                        <span class="portlet-content">
+                            <button  onclick="readmsg()" class="ui-button-small "> Editor</button>
+                            <button  onclick="loadFhir() ;" class="ui-button-small ">View FHIR</button>
+                            <button id="toggle1" onclick="toggleIndex()" class="ui-button-small ">Toggle Indexing</button>
+                            <button id="toggle2" onclick="toggleEmptyData()" class="ui-button-small ">Toggle Show Empty Data</button>
+                            <button id="toggle3" onclick="toggleShowSegmentDescription()" class="ui-button-small ">Toggle Show Segment Descriptiona</button>
+                            <button id="toggle4" onclick="togglecloseOnSelect()" class="ui-button-small ">Toggle Close On File Select</button>
+                            <!--
+                            <button  onclick="expandCollapseGroups(false,0) ;" class="ui-button-small ">Collapse all</buttotoggleShowSegmentDescriptionn>
+                            <button  onclick="expandCollapseGroups(true,0) ;" class="ui-button-small ">Expand all</button>
+                            -->
+                        </span>
+                    </span>
+                </span>
+            </div>             
+          
+            <div id="hl7browser" style="display:none" class="content">
+                <table id="hl7list"></table> 
+                <div id="hl7pager"></div> 
+            </div>
+           </div>
+           <div id="dialog-fileviewer" title='HL7 Files' style="display:none">
+            <div class="content">
+                <div>
+                    <table id="hl7filelist"></table> 
+                    <div id="hl7filepager"></div> 
+                </div>
+            </div> 
+            </div>
+        
+            <div id="dialog-hl7convert" title='HL7 Editor'  style="display:none">
+               
+                    <textarea  wrap="off" spellcheck="false"  id="hl7raw" rows="21" cols="30">                          
+                    </textarea>
+                    <pre id="editor"></pre>
+                    <div id="statusBar"></div>
+                
+              
+            </div>
+            <div id="dialog-fhir" title='HL7v2-FHIR Browser - experimental'  style="display:none">
+                <div id="jsoneditor" style="width:100%;height:650px;" >
+                </div>
+            </div>
+            <div id="dialog-html"  title='Segment'  style="display:none">
+                <div id="edithtml">
+                </div>   
+            </div>
+            <script>
+               var editor = ace.edit("editor");
+              // editor.session.setMode(`ace/mode/ini`);
+                editor.setOptions({
+                    fadeFoldWidgets:true,
+                    showFoldWidgets:true,
+                    foldStyle:'markbegin',
+                    showLineNumbers:false,
+                    showGutter:false
+                });
+                editor.getSession().setUseWorker(false)
+                editor.container.addEventListener("contextmenu", function(e) {
+                    e.preventDefault();
+                    var currline = editor.getSelectionRange().start.row;
+                    var wholelinetxt = editor.session.getLine(currline);
+                    let type = wholelinetxt.split("|")[0]
+                    loadData(wholelinetxt,(result)=>{
+                        let html = _formatHTML(type,result[0])
+                        $("div", "#dialog-html").html(html); 
+                        $( "#dialog-html" ).dialog({ title: type+" Segment" }).dialog('open')
+                  
+                    })
+                    return false;
+                }, false);
+                editor.getSession().on('change', function(e) {
+                    if (!  setVal){
+                        dirty = true;
+                    }
+                });
+            </script>
+    </body>
+  
+</html>
+    
+    
+ 

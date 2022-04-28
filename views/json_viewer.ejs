@@ -1,0 +1,115 @@
+
+  
+		
+	
+		<script src="/jsoneditor/dist/jsoneditor.js"></script>
+		<script src="/jsoneditor/fhirjson2html.js"></script>
+		<style>   
+			h1 {text-align: center;}
+			h2 {text-align: center; background: #d3d1d4 !important;}
+			h3 { background: #f3d1d4 !important;}
+			h4 { background: #e3d184 !important;}      
+			.table {
+				border-collapse: collapse; 
+				border-spacing: 0;
+			}         
+		</style>
+		<div class="toolbar" id="loginHeader" style="border:0px solid green; word-wrap:break-word; margin:0 0 0 0 ; overflow:auto; padding:0px;  height:25px; ">     	     
+			<button class='block_button' id="json-btn"  class="ui-button ui-widget ui-corner-all">JSON</button>
+			<button class='block_button' id="html-btn"  class="ui-button ui-widget ui-corner-all">HTML</button>
+		</div>
+		<div  id="html-view">
+		
+		</div>
+	   	<div  style="width:99%;height:650px;">
+			<div id="jsoneditor" style="width:99%;height:650px;" ></div>
+			<div class="toolbar" id="footer" style="display:none;border:0px solid green; word-wrap:break-word; margin:0 0 0 0 ; overflow:auto; padding:0px;  height:25px; ">     	     
+				<button class='block_button' id="save-btn"  class="ui-button ui-widget ui-corner-all">Save</button>
+			</div>
+		</div>
+		
+		<script>
+			let baseUrl = document.location.origin;
+			let dirty = false;
+			let prevcell = {};		
+			let _data = <%-data%>;
+			let title = "<%-page_title%>"
+			let mode = "<%-mode%>";
+		
+			// create the editor
+			var container = document.getElementById("jsoneditor");
+			var options = {
+				//modes: ['view','text','tree','code'],
+				modes: ['view','text'], // allowed modes
+				onError: function (err) {
+					console.log(err.toString());
+				},
+				onModeChange:  (newMode, oldMode) => {
+					console.log('Mode switched from '+ oldMode+ ' to '+ newMode);
+				},
+				onChange: function () {
+					dirty = true;
+					console.log("change");
+				}
+			};
+			editor = new JSONEditor(container, options);
+			let setdata = (data) =>{
+				if(data){
+					editor.set(data)
+					$('#html-view').hide()		
+					fhir2html(data,(html)=>{
+						console.log("JSON editor HTML",html)
+						if(isEmpty(html)){
+							$('#jsoneditor').show()	
+							$('#html-view').hide()			
+							$('#loginHeader').hide()
+						} else {
+							$('#html-view').html(''+html)
+							$('#loginHeader').show()
+						}
+					})	
+					$('#json-btn').on("click", (e)=>{
+						$('#jsoneditor').show()	
+						$('#html-view').hide()			
+					})
+					$('#html-btn').on("click", (e)=>{
+						$('#jsoneditor').hide()	
+						$('#html-view').show()		
+					})
+				}		
+			}
+			window.addEventListener("message",(event)=>{
+				let data = event.data
+				setdata(data)
+			},false) 
+			$(function() {   
+				setdata(_data)  
+				$('#loginHeader').hide()
+				$('#save-btn').on("click", (e)=>{
+					let data = editor.get()
+					let url = '/config/save'
+					$.ajax({
+						url :url,
+						data:JSON.stringify(data),
+						async:true,
+						method: 'POST',
+						contentType: "application/json; charset=utf-8",
+ 						dataType: "json",
+						success: function(data, textStatus, jqXHR) {	                   
+						},
+						error: function (jqXHR, textStatus, errorThrown) {
+							console.log(errorThrown)                      
+						}
+					});    
+				})
+				if(mode=='edit'){
+					$('#footer').show()
+				}
+			})
+			fhir2html(_data,(html)=>{
+				$('#html-view').html(''+html)
+			})	
+		</script>
+   </div>   
+ 
+  

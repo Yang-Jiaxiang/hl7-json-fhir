@@ -1,0 +1,23 @@
+{
+    "applicaion": "HL7 Viewer",
+    "app":"HL7",  
+    "version": "1.0",
+    "devEnv": "STAGE",
+    "hl7Directory":"./hl7data/","help_hl7Directory":"set the path on the server for reading hl7 files from client",
+    "hosts":{
+        "cch":"http://localhost:14220",
+        "dict":"http://localhost:49322",
+        "redis":"http://localhost:6379",
+        "mongo":"http://localhost:27017",
+        "logger":"http://localhost:49321",  
+        "authurl": "http://localhost:6002",
+        "fhirhost": "http://192.168.160.31:7443",
+        "sqlserver": "http://192.168.170.41:1433"
+    },
+    "openBrowser_help":" set use to true to open browser on startup - link for url to server - browser = name of browser firexox etc",
+    "openBrowser":{
+        "use":false,
+        "browser":"default",
+        "link":"http://localhost:10444/hl7Viewer"
+    } 
+}

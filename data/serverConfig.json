@@ -1,0 +1,122 @@
+{
+    "hosts":{
+        "dict":"http://localhost:49322",
+        "redis":"http://localhost:6379",
+        "mongo":"http://localhost:27017",
+        "logger":"http://localhost:49321",  
+        "authurl": "http://localhost:6002",
+        "fhirhost": "http://192.168.160.31:7443",
+        "sqlserver": "http://192.168.170.41:1433"
+    },
+    "application":{
+        "type":"express",
+        "name":"appExress"
+    },
+    "useCors":true,
+    "useCluster":false,
+    "express":{
+        "options":{
+            "json":{"limit": "100mb"},
+            "static":{
+                "path":"public",
+                "dotfiles": "ignore",
+                "etag": false,
+                "extensions": ["htm", "html"],
+                "index": false,
+                "maxAge": "1d",
+                "redirect": false,
+                "setHeaders":" function (res, path, stat) {res.set('x-timestamp', Date.now())}"
+            }
+        }
+    },
+    "viewEngine":{
+        "use":"ejs",
+        "ejs":{
+            "options":{
+               
+            }
+        },
+        "pug":{
+            "options":{
+                            
+            }
+        }
+    },
+    "routes":{
+        "diagnosticsRoutes":{
+            "use":true
+        },
+        "diagramRoutes":{
+            "use":false
+        },        
+        "testRoutes":{
+            "use":false
+        },
+        "hl7Routes":{
+            "use":true
+        }
+    },
+    "server":"restServer",
+    "restServer":{
+        "use":"http",
+        "https":{
+            "func":"startHTTPS",
+            "options": {
+                "port": 60001,
+                "cert": "./auth/fhir.shinnyapi.org.crt.pem",
+                "key": "./auth/fhir.shinnyapi.org.key",
+                "ca": "./auth/hecFHIRPem.pem"
+            } 
+        },
+        "http":{
+            "func":"startHTTP",
+            "options": {
+                "port": 10444
+            } 
+        }
+
+    },
+    "httpServer":{
+        "use":"http",
+        "https":{
+            "func":"startHTTPS",
+            "options": {
+                "port": 60001,
+                "cert": "./auth/fhir.shinnyapi.org.crt.pem",
+                "key": "./auth/fhir.shinnyapi.org.key",
+                "ca": "./auth/hecFHIRPem.pem"
+            } 
+        },
+        "http":{
+            "func":"startHTTP",
+            "options": {
+                "port": 14220
+            } 
+        }
+
+    },
+    "email_server": {
+        "user": "",
+        "password": "",
+        "host": "192.168.170.230",
+        "port": 25,
+        "ssl": false
+    },
+    "socketio_options": {
+        "useSocketIO": true,
+        "messages":["pix",
+                    "qenames",
+                    "smpi",
+                    "ping"]
+    } ,
+    "cluster_options": {
+        "useCluster": true,
+        "workers": 3  
+    } 
+}
+
+
+
+
+
+

@@ -1,0 +1,140 @@
+
+	<html>
+        <link rel="stylesheet" type="text/css" media="screen" id="jqtheme" href="/themes/redmond/jquery-ui.css" />
+  
+        <link rel="stylesheet" type="text/css" media="screen" href="/themes/ui.multiselect.css" />
+
+        <link rel="stylesheet" type="text/css" media="screen" href="/themes/ui.jqgrid.css" />
+
+        <script src="/jqgrid/jquery.js" type="text/javascript"></script>
+
+        <script src="/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+        <link href="/jquery-ui/jquery.multiselect.css" rel="stylesheet" />
+        <script src="/jquery-ui/jquery.multiselect.js"></script>
+        
+    
+        <script type="text/ecmascript" src="/jqgrid/js/jquery.jqGrid.min.js" ></script>
+        <script type="text/ecmascript" src="/jqgrid/js/i18n/grid.locale-en.js"></script>
+        <script type="text/ecmascript" src="/jqgrid/plugins/jquery.tablednd.js" ></script>
+		 <link rel="stylesheet" type="text/css" media="screen" href="/themes/jqgrid.css" />
+        <style>
+            html, body {
+                height: 100%;
+                overflow:auto;
+            }
+            body #fixedElement {
+                position:fixed !important; 
+                position: absolute; /*ie6 */
+                bottom: 0;
+            }
+            .collapsetable{
+                border-collapse: collapse;
+                border: 3px solid blue;
+            }
+            .round{
+                border-radius: 15px;
+                border: 2px solid purple;
+                padding: 5px;
+            }
+            .navbar {
+                    position: fixed!important;
+                    z-index: 999;
+                    top: 3em;
+                 
+                    left: 2em;
+                    margin-top: -2.5em;
+                    border: 1px solid #CCC;
+                }
+            .content {
+                position: relative!important;
+                
+                top: 30px;
+                left:0;
+                width:100%;
+
+                
+            
+                border: 1px solid #CCC;
+            }
+          
+            </style>
+       
+
+    <head>
+        <title>hl7 file viewer</title>
+        <script>
+            var fieldStructures  
+            var HL7version = "v2.4"
+            var filegrid
+        </script>
+    </head>
+    <body>
+	
+	
+		
+		<script>
+			let baseUrl = document.location.origin
+			$( () => {
+				filepager = "hl7filepager";
+				filegrid = $("#hl7filelist");       
+				let fileviewerOptions = { 
+					"url":"/readfiles/",      
+					"datatype":"json",
+					"altRows": true, 
+					"deepempty": true,
+					"autowidth": true,
+					"shrinkToFit": true,
+					"ignoreCase": true,
+					"multiselect":false,
+					"multiboxonly":false,
+					"height":"auto",
+					"width":"auto",
+					"scrollOffset":0,
+					"hoverrows":false,
+					"colModel":[
+					//	{label:'file',name:'file', editable:false ,width:120,title: false},
+						{label:'filename',name:'filename', editable:true ,width:350,title: true},
+					],
+				
+				//  
+				 "loadonce":true,
+				// "toppager":true,
+				// "pager":"#"+filepager,
+					"rowTotal": 5000,
+					"rowNum":5000,
+					"rowList": [],        // disable page size dropdown leave empty array
+					"pgbuttons": false,     // disable page control like next, back button
+					"pgtext": null,         // disable pager text like 'Page 0 of 10'
+					"viewrecords": false ,   // disable current view record text like 'View 1-10 of 100' 
+					"gridview": false,
+					"autoencode": true,           
+					"caption": "" ,   
+					beforeSelectRow: (rowid, e)=> {
+						return true; // turn row highlight off
+					},
+					"ondblClickRow": (rowid, iRow,iCol) => {		           
+						//sendURL(rowid)
+						let rowData = grid.jqGrid("getRowData",rowid);
+						let file = rowData.file                    
+						let filename = rowData.filename
+						
+					},
+				};
+				filegrid.jqGrid(fileviewerOptions);   
+				filegrid.jqGrid('gridResize',{minWidth:450,maxWidth:1400,minHeight:180, maxHeight:650});
+			// grid.jqGrid('navGrid', '#'+filepager, {  cloneToTop:true,add: false, edit: false, del: false ,refresh:true,search:false} , { position: 'center' });
+			
+          
+        });     
+      
+		</script>
+		<div class="content">
+			<div>
+				<table id="hl7filelist"></table> 
+				<div id="hl7filepager"></div> 
+			</div>
+		</div> 
+	
+		</body>
+	</html>
+  

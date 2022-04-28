@@ -1,0 +1,39 @@
+{
+  "name": "hl7viewer",
+  "version": "0.1.0",
+  "private": true,
+  "bin": "app-hl7.js",
+  "pkg": {
+    "assets": [
+      "node_modules/**/*",
+      "public/**/*",
+      "views/*",
+      "data/*",
+      "routes/*",
+      "src/*"
+    ],
+    "targets": [
+      "node10-win-x64"
+    ],
+    "output": "dist.exe"
+  },
+  "dependencies": {
+    "circular-json": "^0.5.9",
+    "console-stamp": "^0.2.6",
+    "cors": "^2.8.5",
+    "ejs": "^1.0.0",
+    "ejs-middleware": "0.0.3",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "express-http-proxy": "^1.6.0",
+    "line-reader": "^0.4.0",
+    "moment": "^2.29.3",
+    "node-rest-client": "^3.1.1",
+    "open": "^8.4.0",
+    "require-like": "^0.1.2",
+    "split": "^1.0.1",
+    "sqlite3": "^5.0.2",
+    "tcp-ping": "^0.1.1",
+    "uuid": "^8.3.2"
+  }
+}
