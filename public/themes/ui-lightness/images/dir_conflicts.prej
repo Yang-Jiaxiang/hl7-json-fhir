@@ -1,0 +1,10 @@
+Trying to add new property 'svn:ignore' with value '*.ini
+*.dcu
+*.elf
+*.indentcache
+',
+but property already exists with value '*.dcu
+*.elf
+*.identcache
+*.ini
+'.
