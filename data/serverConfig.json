@@ -82,9 +82,9 @@
             "func":"startHTTPS",
             "options": {
                 "port": 60001,
-                "cert": "./auth/fhir.shinnyapi.org.crt.pem",
-                "key": "./auth/fhir.shinnyapi.org.key",
-                "ca": "./auth/hecFHIRPem.pem"
+                "cert": "./auth/fhir.api.org.crt.pem",
+                "key": "./auth/fhir.api.org.key",
+                "ca": "./auth/FHIRPem.pem"
             } 
         },
         "http":{
