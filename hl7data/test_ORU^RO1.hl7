@@ -1,0 +1,7 @@
+MSH|^~\&|MESA_RPT_MGR|EAST_RADIOLOGY|iFW|XYZ|||ORU^R01|MESA3b|P|2.4||||||||
+PID|||CR3^^^ADT1||CRTHREE^PAUL|||||||||||||PatientAcct||||||||||||
+PV1||1|CE||||12345^SMITH^BARON^H|||||||||||
+OBR|||||||20010501141500.0000||||||||||||||||||F||||||||||||||||||
+OBX|1|HD|SR Instance UID||1.113654.1.2001.30.2.1||||||F||||||
+OBX|2|TX|SR Text||Radiology Report History Cough Findings PA evaluation of the chest demonstrates the lungs to be expanded and clear. Conclusions Normal PA chest x-ray.||||||F||||||
+CTI|study1|^1|^10_EP1
