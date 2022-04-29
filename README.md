@@ -55,14 +55,14 @@ should get a directory structure
   ###  install pkg if you need to build single file executables
     npm install pkg -g
 
-# build
+## build
   cwd to directory with code
   ### install all node_modules
     npm install
   #### build executable
     pkg .
 
-# running
+## running
   ### run executable
     hl7viewer.exe
   ### using node
@@ -70,13 +70,13 @@ should get a directory structure
   ### using nodemon - this will watch any changes to files and restart
     nodemon app-hl7.js
   ### using pm2 this is the prefered way on production server
-  ### it will demonize the app and keep it running forevers,with monitoring
-  ### also configure startup scripts to restart app after server-restart
+  ### it will demonize the app and keep it running forever with monitoring
+  ### also it will configure startup scripts to restart app after server-restart
     pm2 start hl7viewer.exe
     or
     pm2 start app-hl7.js
     
-# REST API
+## REST API
 
   [/hl72json]
   [/hl72json/:filename]
