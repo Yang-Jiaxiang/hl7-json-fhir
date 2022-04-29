@@ -7,29 +7,29 @@ hl7 to json parser and a viewer to display hl7 in a readable format
 unzip the hl7app into a directory
 should get a directory structure 
 
-|-data|
-|     |-hl72json.json  -- mapping of HL7 segments to json
-|     |-serverConfig.json -- server configuration
-|-hl7data   -- for testing only
-|-public  -- files for jquery themes etc
-|-routes|
-|        |-hl7Routes -- REST API for hl7v2 parsing and hl7 v2 to json and
-|        |-diagnosticRoutes  -- nodejs and system diagnostics
-|-src  |
-|      |-db.js  -- dtabase connections for mongo sqlite
-|      |-dictHelper  -- connection to database dictionry if used
-|      |-hl7tojson_Profiles.js  -- parser to convert hl7 v to json
-|      |-restServer -- data driven rest server
-|      |-utils.js  -- some usefull functions
-|-views  |
-|        |-filelist.ejs  -- viewer for files on server
-|        |-hl7list.ejs  -- viewer for displaying parsed hl7 v2 files
-|        |-json_viewer.ejs -- viewer and editor for json files
-|-config.json  -- configuration ile for viewer
-|-package.json  -- package for build and node dependencies
-|-app-hl7.js -- data driven app stubb
-|-README.md -- you are reading it
-|-hl7viewer.exe  -- packaged app windows only do not need node on machine
+#### |-data|
+#### |     |-hl72json.json  -- mapping of HL7 segments to json
+#### |     |-serverConfig.json -- server configuration
+#### |-hl7data   -- for testing only
+#### |-public  -- files for jquery themes etc
+#### |-routes|
+#### |        |-hl7Routes -- REST API for hl7v2 parsing and hl7 v2 to json and
+#### |        |-diagnosticRoutes  -- nodejs and system diagnostics
+#### |-src  |
+#### |      |-db.js  -- dtabase connections for mongo sqlite
+#### |      |-dictHelper  -- connection to database dictionry if used
+#### |      |-hl7tojson_Profiles.js  -- parser to convert hl7 v to json
+#### |      |-restServer -- data driven rest server
+#### |      |-utils.js  -- some usefull functions
+#### |-views  |
+#### |        |-filelist.ejs  -- viewer for files on server
+#### |        |-hl7list.ejs  -- viewer for displaying parsed hl7 v2 files
+#### |        |-json_viewer.ejs -- viewer and editor for json files
+#### |-config.json  -- configuration ile for viewer
+#### |-package.json  -- package for build and node dependencies
+#### |-app-hl7.js -- data driven app stubb
+#### |-README.md -- you are reading it
+#### |-hl7viewer.exe  -- packaged app windows only do not need node on machine
 
 ### running 
   files needed hl7viewer.exe and config.json
@@ -98,7 +98,7 @@ should get a directory structure
               }
           }
       });
-  [/readfiles]
+ [/readfiles]
   ### read files fron config.hl7Directory on server and return in json format to show in grid
   ### this is usuall put in the url part of jqgrid
     jQuery("#fileviewer").jqGrid(
