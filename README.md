@@ -29,7 +29,8 @@ should get a directory structure
 #### |-package.json  -- package for build and node dependencies
 #### |-app-hl7.js -- data driven app stubb
 #### |-README.md -- you are reading it
-#### |-hl7viewer.exe  -- packaged app windows only do not need node on machine
+
+
 
 ### running 
   files needed hl7viewer.exe and config.json
