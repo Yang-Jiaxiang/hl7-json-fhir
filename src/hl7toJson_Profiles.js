@@ -471,7 +471,7 @@ let IN1_fhir = (IN1,IN2) => {
         if(IN1.IN1_4) {
             profile.resource.payorsName = XON_fhir(IN1.IN1_4)
         }
-        if(IN1.IN1_4) {
+        if(IN1.IN1_5) {
             profile.resource.insuranceAddress = XAD_fhir(IN1.IN1_5)
         }
         if(IN1.IN1_6) {
